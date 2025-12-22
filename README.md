@@ -33,23 +33,32 @@ In timing diagram Q0 is changing as soon as the negative edge of clock pulse is 
  Developed by:Amrita B S RegisterNumber:25018474
 */
 ```
-module  encoder_8to3(
-    input  wire [7:0] in,   // 4 input lines
-    output reg  [2:0] out   // 2 output lines
-);
-    always @(*) begin
-        case (in)
-            8'b00000001: out = 2'b000;
-            8'b00000010: out = 2'b001;
-            8'b00000100: out = 2'b010;
-            8'b00001000: out = 2'b011;
-				8'b00010000: out = 2'b100;
-				8'b00100000: out = 2'b101;
-				8'b01000000: out = 2'b110;
-				8'b10000000: out = 2'b111;
-            default: out = 2'bxxx;  // Invalid case
-        endcase
-    end
+module ripple(q, clk, reset); 
+output [3:0] q;
+input clk, reset;
+T_FF tffo(q[0], clk, reset); 
+T_FF tff1(q[1], q[0], reset); 
+T_FF tff2(q[2], q[1], reset); 
+T_FF tff3(q[3], q[2], reset); 
+endmodule
+
+module D_FF(q, d, clk, reset); 
+output q;
+input d, clk, reset;
+reg q;
+always @(posedge reset or negedge clk)
+ if (reset)
+q = 1'b0;
+ else
+q = d;
+endmodule
+
+module T_FF(q, clk, reset);
+output q;
+input clk, reset;
+wire d;
+D_FF dff0(q, d, clk, reset);
+not n1(d, q); // not is Verilog-provided primitive. 
 endmodule
 ```
 
